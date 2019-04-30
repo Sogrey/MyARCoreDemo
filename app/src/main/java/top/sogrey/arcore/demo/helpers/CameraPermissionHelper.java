@@ -24,7 +24,9 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
-/** Helper to ask camera permission. */
+/** Helper to ask camera permission.
+ * @author Google-ar
+ * */
 public final class CameraPermissionHelper {
     private static final int CAMERA_PERMISSION_CODE = 0;
     private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
