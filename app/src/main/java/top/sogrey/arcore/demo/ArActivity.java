@@ -1,18 +1,12 @@
 package top.sogrey.arcore.demo;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
@@ -38,16 +32,13 @@ import top.sogrey.arcore.demo.helpers.SnackbarHelper;
  */
 public class ArActivity extends AppCompatActivity {
     private static final String TAG = ArActivity.class.getSimpleName();
-    private static final double MIN_OPENGL_VERSION = 3.0;
     private Session mSession;
-    private boolean mUserRequestedInstall=false;
+    private boolean mUserRequestedInstall = false;
     private final SnackbarHelper messageSnackbarHelper = new SnackbarHelper();
     private ArFragment arFragment;
     private ModelRenderable andyRenderable;
+
     @Override
-    @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
-    // CompletableFuture requires api level 24
-    // FutureReturnValueIgnored is not valid
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ar);
@@ -78,15 +69,12 @@ public class ArActivity extends AppCompatActivity {
         // When you build a Renderable, Sceneform loads its resources in the background while returning
         // a CompletableFuture. Call thenAccept(), handle(), or check isDone() before calling get().
         ModelRenderable.builder()
-                .setSource(this, Uri.parse("chair.sfb"))
+                .setSource(this, Uri.parse("house.sfb"))
                 .build()
                 .thenAccept(renderable -> andyRenderable = renderable)
                 .exceptionally(
                         throwable -> {
-                            Toast toast =
-                                    Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
+                            messageSnackbarHelper.showMessageWithDismiss(this, "Unable to load andy renderable");
                             return null;
                         });
     }
@@ -94,17 +82,12 @@ public class ArActivity extends AppCompatActivity {
     void maybeEnableArButton() {
         ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
         if (availability.isTransient()) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    maybeEnableArButton();
-                }
-            }, 200);
+            new Handler().postDelayed(this::maybeEnableArButton, 200);
         }
         if (availability.isSupported()) {
-            Toast.makeText(this, "ARCore is Supported", Toast.LENGTH_LONG).show();
+            messageSnackbarHelper.showMessageWithDismiss(this, "ARCore is Supported");
         } else { // Unsupported or unknown.
-            Toast.makeText(this, "ARCore is Unsupported or unknown.", Toast.LENGTH_LONG).show();
+            messageSnackbarHelper.showMessageWithDismiss(this, "ARCore is Unsupported or unknown.");
         }
     }
 
@@ -127,7 +110,8 @@ public class ArActivity extends AppCompatActivity {
                         return;
                     case INSTALLED:
                         break;
-                        default:break;
+                    default:
+                        break;
                 }
 
                 // ARCore requires camera permissions to operate. If we did not yet obtain runtime
@@ -184,8 +168,7 @@ public class ArActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] results) {
         if (!CameraPermissionHelper.hasCameraPermission(this)) {
-            Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
-                    .show();
+            messageSnackbarHelper.showMessageWithDismiss(this, "Camera permission is needed to run this application");
             if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
                 // Permission denied with checking "Do not ask again".
                 CameraPermissionHelper.launchPermissionSettings(this);

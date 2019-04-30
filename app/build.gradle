@@ -51,3 +51,8 @@ sceneform.asset('sampledata/chair/model.obj', // 'Source Asset Path' specified d
         'default',                            // 'Material Path' specified during import.
         'sampledata/chair/model.sfa',         // '.sfa Output Path' specified during import.
         'src/main/assets/chair')              // '.sfb Output Path' specified during import.
+
+sceneform.asset('sampledata/house/house.obj', // 'Source Asset Path' specified during import.
+        'default',                            // 'Material Path' specified during import.
+        'sampledata/house/house.sfa',         // '.sfa Output Path' specified during import.
+        'src/main/assets/house')              // '.sfb Output Path' specified during import.
